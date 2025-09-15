@@ -7,9 +7,10 @@ const CLIENT_API_KEY = process.env.CLIENT_API_KEY;
 const MERCHANT_ORDER_ID = process.env.MERCHANT_ORDER_ID;
 const MERCHANT_TSP_ID = process.env.MERCHANT_TSP_ID;
 const MERCHANT_CALLBACK = process.env.MERCHANT_CALLBACK;
+const CLIENT_LOGIN = process.env.CLIENT_LOGIN;
 
 // Генерация случайной строки для qrc_id
-function generateRandomId(length = 16) {
+function generateRandomId(length = 32) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
   for (let i = 0; i < length; i++) {
@@ -25,8 +26,9 @@ export default async function handler(req, res) {
 
   // Проверка API-ключа
   const token = req.headers["x-api-key"];
-  if (!token || token !== CLIENT_API_KEY) {
-    return res.status(401).json({ error: "Invalid API key" });
+  const login = req.headers["x-api-login"];
+  if (!token || token !== CLIENT_API_KEY || !login || login !== CLIENT_LOGIN) {
+    return res.status(401).json({ error: "Invalid API credentials" });
   }
 
   try {
