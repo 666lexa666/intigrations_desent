@@ -47,24 +47,31 @@ export default async function handler(req, res) {
     const authData = await authRes.json();
     if (!authData.accessToken) throw new Error("Ошибка авторизации");
 
-    // Создание заказа (обязательно paymentAmount для RUB!)
+    // Формируем тело запроса на создание заказа
+    const orderBody = {
+      merchantOrderId: MERCHANT_ORDER_ID,
+      paymentAmount: sum,
+      orderCurrency: "RUB",
+      tspId: MERCHANT_TSP_ID,
+      description: `Пополнение steam`,
+      callbackUrl: MERCHANT_CALLBACK,
+    };
+
+    // Логируем запрос перед отправкой
+    console.log("Отправляем запрос на создание заказа Pay2Day:", JSON.stringify(orderBody, null, 2));
+
+    // Создание заказа
     const orderRes = await fetch("https://pay.kanyon.pro/api/v1/order", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${authData.accessToken}`,
       },
-      body: JSON.stringify({
-        merchantOrderId: MERCHANT_ORDER_ID,
-        paymentAmount: sum,
-        orderCurrency: "RUB",
-        tspId: MERCHANT_TSP_ID,
-        description: `Пополнение `,
-        callbackUrl: MERCHANT_CALLBACK,
-      }),
+      body: JSON.stringify(orderBody),
     });
     const orderData = await orderRes.json();
 
+    // Логируем ответ
     console.log("Ответ на создание заказа:", orderData);
 
     if (!orderData.order || !orderData.order.id) {
@@ -80,6 +87,8 @@ export default async function handler(req, res) {
       },
     });
     const qrData = await qrRes.json();
+
+    // Логируем QR-ответ
     console.log("QR данные:", qrData);
 
     if (!qrData.order?.payload) {
