@@ -7,9 +7,9 @@ const redis = new Redis({
 });
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method !== 'GET' && req.method !== 'POST') {
+  return res.status(405).json({ error: 'Method not allowed' });
+}
 
   try {
     const { opId } = req.query;
