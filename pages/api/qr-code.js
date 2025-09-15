@@ -8,13 +8,23 @@ const MERCHANT_ORDER_ID = process.env.MERCHANT_ORDER_ID;
 const MERCHANT_TSP_ID = process.env.MERCHANT_TSP_ID;
 const MERCHANT_CALLBACK = process.env.MERCHANT_CALLBACK;
 
+// Генерация случайной строки для qrc_id
+function generateRandomId(length = 16) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
   // Проверка API-ключа
-  const token = req.headers['x-api-key'];
+  const token = req.headers["x-api-key"];
   if (!token || token !== CLIENT_API_KEY) {
     return res.status(401).json({ error: "Invalid API key" });
   }
@@ -29,7 +39,10 @@ export default async function handler(req, res) {
     const authRes = await fetch("https://identity.authpoint.pro/api/v1/public/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ login: process.env.PAY2DAY_LOGIN, password: process.env.PAY2DAY_PASSWORD }),
+      body: JSON.stringify({
+        login: process.env.PAY2DAY_LOGIN,
+        password: process.env.PAY2DAY_PASSWORD,
+      }),
     });
     const authData = await authRes.json();
     if (!authData.accessToken) throw new Error("Ошибка авторизации");
@@ -51,8 +64,10 @@ export default async function handler(req, res) {
       }),
     });
     const orderData = await orderRes.json();
-    if (!orderData.order?.id || !orderData.order?.externalOrderId) {
-      throw new Error("Ошибка создания заказа");
+    console.log("Создание заказа Pay2Day:", orderData);
+
+    if (!orderData.order?.id) {
+      throw new Error("Ошибка создания заказа: " + JSON.stringify(orderData));
     }
 
     // Получение QR
@@ -64,16 +79,21 @@ export default async function handler(req, res) {
       },
     });
     const qrData = await qrRes.json();
+    console.log("QR данные:", qrData);
+
     if (!qrData.order?.payload) {
-      throw new Error("Ошибка получения QR");
+      throw new Error("Ошибка получения QR: " + JSON.stringify(qrData));
     }
+
+    // Генерация qrc_id, если Pay2Day не вернул externalOrderId
+    const qrcId = orderData.order.externalOrderId || generateRandomId(16);
 
     // Возвращаем клиенту структурированный JSON
     return res.status(200).json({
       result: {
         qr_link: qrData.order.payload,
         operation_id: orderData.order.id,
-        qrc_id: orderData.order.externalOrderId,
+        qrc_id: qrcId,
       },
     });
   } catch (error) {
