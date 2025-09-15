@@ -4,9 +4,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const CLIENT_API_KEY = process.env.CLIENT_API_KEY;
-const MERCHANT_ORDER_ID = "game-refill-pro";
-const MERCHANT_TSP_ID = 1408;
-const MERCHANT_CALLBACK = "https://webhook-ooo.vercel.app/api/webhook";
+const MERCHANT_ORDER_ID = process.env.MERCHANT_ORDER_ID;
+const MERCHANT_TSP_ID = process.env.MERCHANT_TSP_ID;
+const MERCHANT_CALLBACK = process.env.MERCHANT_CALLBACK;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
