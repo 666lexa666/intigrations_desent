@@ -31,8 +31,10 @@ export default async function handler(req, res) {
 
   try {
     const { sum } = req.body;
-    if (!sum) {
-      return res.status(400).json({ error: "Missing sum" });
+
+    // Проверка, что sum присутствует и это число > 0
+    if (typeof sum !== "number" || sum <= 0) {
+      return res.status(400).json({ error: "Invalid sum: must be a positive number" });
     }
 
     // Авторизация в Pay2Day
