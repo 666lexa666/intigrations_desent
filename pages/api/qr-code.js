@@ -47,7 +47,7 @@ export default async function handler(req, res) {
     const authData = await authRes.json();
     if (!authData.accessToken) throw new Error("Ошибка авторизации");
 
-    // Создание заказа
+    // Создание заказа (обязательно paymentAmount для RUB!)
     const orderRes = await fetch("https://pay.kanyon.pro/api/v1/order", {
       method: "POST",
       headers: {
@@ -59,14 +59,15 @@ export default async function handler(req, res) {
         paymentAmount: sum,
         orderCurrency: "RUB",
         tspId: MERCHANT_TSP_ID,
-        description: "Пополнение",
+        description: `Пополнение `,
         callbackUrl: MERCHANT_CALLBACK,
       }),
     });
     const orderData = await orderRes.json();
-    console.log("Создание заказа Pay2Day:", orderData);
 
-    if (!orderData.order?.id) {
+    console.log("Ответ на создание заказа:", orderData);
+
+    if (!orderData.order || !orderData.order.id) {
       throw new Error("Ошибка создания заказа: " + JSON.stringify(orderData));
     }
 
