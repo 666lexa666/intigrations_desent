@@ -38,15 +38,15 @@ export default async function handler(req, res) {
 
     // Запрос статуса заказа
     const statusRes = await fetch(`https://kassa-doc.pay2day.kz/status/${opId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authData.accessToken}`,
-      },
-    });
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${authData.accessToken}`,
+  },
+});
 
-    const statusData = await statusRes.json();
-    console.log("Статус заказа Pay2Day:", statusData);
+const statusData = await statusRes.json();
+console.log("Статус заказа Pay2Day:", statusData);
 
     // Возвращаем клиенту
     return res.status(200).json({
