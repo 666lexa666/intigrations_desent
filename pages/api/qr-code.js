@@ -54,8 +54,8 @@ export default async function handler(req, res) {
       merchantOrderId: MERCHANT_ORDER_ID,
       paymentAmount: sum,
       orderCurrency: "RUB",
-      tspId: MERCHANT_TSP_ID,
-      description: `Пополнение steam`,
+      tspId: Number(MERCHANT_TSP_ID),
+      description: `Пополнение`,
       callbackUrl: MERCHANT_CALLBACK,
     };
 
