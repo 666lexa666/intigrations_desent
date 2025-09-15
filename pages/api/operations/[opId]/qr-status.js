@@ -36,22 +36,33 @@ export default async function handler(req, res) {
     const authData = await authRes.json();
     if (!authData.accessToken) throw new Error("Ошибка авторизации");
 
-    // Запрос статуса заказа
+    // GET-запрос статуса заказа
     const statusRes = await fetch(`https://kassa-doc.pay2day.kz/status/${opId}`, {
-  method: "GET",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${authData.accessToken}`,
-  },
-});
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authData.accessToken}`,
+      },
+    });
 
-const statusData = await statusRes.json();
-console.log("Статус заказа Pay2Day:", statusData);
+    // Безопасный парсинг JSON
+    const text = await statusRes.text();
+    let statusData;
+    try {
+      statusData = JSON.parse(text);
+    } catch (err) {
+      console.error("Ошибка парсинга JSON от Pay2Day:", text);
+      return res.status(500).json({
+        error: "Ошибка получения статуса от Pay2Day",
+        body: text,
+      });
+    }
 
-    // Возвращаем клиенту
+    console.log("Статус заказа Pay2Day:", statusData);
+
     return res.status(200).json({
       result: {
-        operation_status_code: statusData.order?.status || "string",
+        operation_status_code: statusData.order?.status || "unknown",
       },
     });
   } catch (error) {
