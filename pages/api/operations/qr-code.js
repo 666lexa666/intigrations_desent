@@ -20,17 +20,6 @@ function generateRandomId(length = 32) {
 }
 
 export default async function handler(req, res) {
-
-// --- CORS START ---
-  res.setHeader("Access-Control-Allow-Origin", "*"); // можно указать конкретный домен вместо "*"
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-api-key, x-api-login");
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end(); // preflight-запрос
-  }
-  // --- CORS END ---
-
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
@@ -76,7 +65,7 @@ export default async function handler(req, res) {
     console.log("Отправляем запрос на создание заказа Pay2Day:", JSON.stringify(orderBody, null, 2));
 
     // Создание заказа
-    const orderRes = await fetch("https://kassa-doc.pay2day.kz/order", {
+    const orderRes = await fetch("https://pay.kanyon.pro/api/v1/order", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +83,7 @@ export default async function handler(req, res) {
     }
 
     // Получение QR
-    const qrRes = await fetch(`https://kassa.pay2day.kz/order/qrcData/${orderData.order.id}`, {
+    const qrRes = await fetch(`https://pay.kanyon.pro/api/v1/order/qrcData/${orderData.order.id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
