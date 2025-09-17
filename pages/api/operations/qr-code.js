@@ -87,7 +87,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${authData.accessToken}`,
+        "Authorization-Token": authData.accessToken,
       },
     });
     const qrData = await qrRes.json();
