@@ -76,7 +76,7 @@ export default async function handler(req, res) {
     console.log("Отправляем запрос на создание заказа Pay2Day:", JSON.stringify(orderBody, null, 2));
 
     // Создание заказа
-    const orderRes = await fetch("https://pay.kanyon.pro/api/v1/order", {
+    const orderRes = await fetch("https://kassa-doc.pay2day.kz/order", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
     }
 
     // Получение QR
-    const qrRes = await fetch(`https://pay.kanyon.pro/api/v1/order/qrcData/${orderData.order.id}`, {
+    const qrRes = await fetch(`https://kassa.pay2day.kz/order/qrcData/${orderData.order.id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
