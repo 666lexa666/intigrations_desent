@@ -13,8 +13,8 @@ export default async function handler(req, res) {
 
   try {
     const { opId } = req.query;
-    const apiKey = req.headers['x-api-key'];
-    const apiLogin = req.headers['x-api-login'];
+    const apiKey = req.headers['x-api-key'] || "TEST";
+    const apiLogin = req.headers['x-api-login'] || "TEST";
 
     if (!opId) {
       return res.status(400).json({ error: 'Missing opId' });
