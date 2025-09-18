@@ -23,12 +23,6 @@ function generateRandomId(length = 16) {
 }
 
 router.post("/", async (req, res) => {
-  const token = req.headers["x-api-key"];
-  const login = req.headers["x-api-login"];
-
-  if (!token || !login || token !== process.env.CLIENT_API_KEY || login !== process.env.CLIENT_LOGIN) {
-    return res.status(401).json({ error: "Invalid API credentials" });
-  }
 
   const { sum } = req.body;
   if (typeof sum !== "number" || sum <= 0) {

@@ -22,14 +22,6 @@ router.get("/", async (req, res) => {
   const apiLogin = req.headers["x-api-login"];
 
   if (!opId) return res.status(400).json({ error: "Missing opId" });
-  if (
-    !apiKey ||
-    !apiLogin ||
-    apiKey !== process.env.CLIENT_API_KEY ||
-    apiLogin !== process.env.CLIENT_LOGIN
-  ) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
 
   try {
     const mongoClient = await getMongoClient();
