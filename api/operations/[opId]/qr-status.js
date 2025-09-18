@@ -35,7 +35,7 @@ router.get("/", async (req, res) => {
     }
 
     return res.status(200).json({
-      result: {
+      results: {
         operation_status_code: order.status === "Оплачено" ? 5 : 1,
       },
     });

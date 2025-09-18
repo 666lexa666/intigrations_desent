@@ -51,7 +51,7 @@ router.post("/", async (req, res) => {
 
     // Формируем ответ для клиента
     return res.status(200).json({
-      result: {
+      results: {
         qr_link: backendData.qrPayload || backendData.qr_link, // на случай разных названий
         operation_id: backendData.id || backendData.operation_id,
         qrc_id: generateRandomId(16)
