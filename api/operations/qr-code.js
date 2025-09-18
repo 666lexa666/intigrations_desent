@@ -48,7 +48,7 @@ router.post("/", async (req, res) => {
         platform,
         steamId: platform === "steam" ? uid : "",
         pubgUid: platform === "pubg" ? uid : "",
-        amount: sum
+        amount: sum / 100
       }),
     });
 
