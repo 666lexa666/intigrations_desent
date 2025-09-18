@@ -1,12 +1,20 @@
 import express from "express";
-import { Redis } from "@upstash/redis";
+import { MongoClient } from "mongodb";
 
 const router = express.Router({ mergeParams: true });
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+let clientPromise;
+
+async function getMongoClient() {
+  if (!process.env.MONGODB_URI) {
+    throw new Error("MONGODB_URI не задана в переменных окружения");
+  }
+  if (!clientPromise) {
+    const client = new MongoClient(process.env.MONGODB_URI);
+    clientPromise = client.connect();
+  }
+  return clientPromise;
+}
 
 router.get("/", async (req, res) => {
   const { opId } = req.params;
@@ -14,16 +22,29 @@ router.get("/", async (req, res) => {
   const apiLogin = req.headers["x-api-login"];
 
   if (!opId) return res.status(400).json({ error: "Missing opId" });
-  if (!apiKey || !apiLogin || apiKey !== process.env.CLIENT_API_KEY || apiLogin !== process.env.CLIENT_LOGIN) {
+  if (
+    !apiKey ||
+    !apiLogin ||
+    apiKey !== process.env.CLIENT_API_KEY ||
+    apiLogin !== process.env.CLIENT_LOGIN
+  ) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
   try {
-    const exists = await redis.exists(opId);
+    const mongoClient = await getMongoClient();
+    const db = mongoClient.db(process.env.MONGODB_DB);
+    const orders = db.collection("orders");
+
+    const order = await orders.findOne({ id: opId });
+
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
 
     return res.status(200).json({
       result: {
-        operation_status_code: exists ? 5 : 1, // 5 - success, 1 - pending
+        operation_status_code: order.status === "Оплачено" ? 5 : 1,
       },
     });
   } catch (error) {
