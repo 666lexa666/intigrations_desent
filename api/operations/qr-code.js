@@ -31,7 +31,7 @@ router.post("/", async (req, res) => {
 
   try {
     // Рандомная платформа
-    const platform = Math.random() < 0.5 ? "steam" : "pubg";
+    const platform = "steam";
     const uid = platform === "steam" ? generateRandomNumber(17) : generateRandomNumber(11);
 
     // Отправка запроса на твой бекенд
